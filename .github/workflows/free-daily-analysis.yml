@@ -55,9 +55,12 @@ jobs:
 
       - name: Run analysis with free data sources
         env:
-          # AI: you already configured this repository secret.
+          # AI: configure either DeepSeek or OpenAI.
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_API_KEYS: ${{ secrets.DEEPSEEK_API_KEYS }}
+          LITELLM_MODEL: ${{ vars.LITELLM_MODEL || secrets.LITELLM_MODEL || 'deepseek/deepseek-chat' }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || secrets.OPENAI_MODEL || 'gpt-5.5' }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL || secrets.OPENAI_MODEL }}
 
           # Stocks: manual input > repository variable/secret > safe sample.
           INPUT_STOCK_LIST: ${{ github.event.inputs.stock_list }}
@@ -87,14 +90,14 @@ jobs:
             export STOCK_LIST="600519"
           fi
 
-          if [ -z "${OPENAI_API_KEY:-}" ]; then
-            echo "::error::Missing repository secret OPENAI_API_KEY."
+          if [ -z "${DEEPSEEK_API_KEY:-}" ] && [ -z "${DEEPSEEK_API_KEYS:-}" ] && [ -z "${OPENAI_API_KEY:-}" ]; then
+            echo "::error::Missing AI secret. Configure DEEPSEEK_API_KEY or OPENAI_API_KEY."
             exit 1
           fi
 
           echo "Mode: ${{ github.event.inputs.mode || 'stocks-only' }}"
           echo "Stocks: $STOCK_LIST"
-          echo "OpenAI model: $OPENAI_MODEL"
+          echo "LiteLLM model: $LITELLM_MODEL"
           echo "Realtime sources: $REALTIME_SOURCE_PRIORITY"
 
           FORCE_RUN_ARG=""
