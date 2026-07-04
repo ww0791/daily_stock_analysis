@@ -10,10 +10,30 @@
 
 ### Secrets
 
-确认已有：
+DeepSeek 用户配置：
 
 ```text
-OPENAI_API_KEY
+DEEPSEEK_API_KEY=你的 DeepSeek API Key
+```
+
+如果你不用 DeepSeek，也可以配置：
+
+```text
+OPENAI_API_KEY=你的 OpenAI API Key
+```
+
+### 飞书推送
+
+最简单方式是配置飞书群自定义机器人 Webhook：
+
+```text
+FEISHU_WEBHOOK_URL=https://open.feishu.cn/open-apis/bot/v2/hook/...
+```
+
+如果飞书机器人开启了签名校验，再加：
+
+```text
+FEISHU_WEBHOOK_SECRET=飞书机器人签名密钥
 ```
 
 ### Variables
@@ -33,7 +53,9 @@ STOCK_LIST=600519,hk00700,AAPL
 可选：如果你的 OpenAI Key 不能使用默认模型，再新增：
 
 ```text
-OPENAI_MODEL=gpt-5.5
+LITELLM_MODEL=deepseek/deepseek-chat
+REPORT_TYPE=full
+NOTIFICATION_REPORT_CHANNELS=feishu
 ```
 
 ## 手动跑一次
@@ -41,9 +63,9 @@ OPENAI_MODEL=gpt-5.5
 1. 打开 `Actions`
 2. 选择 `Free Daily Stock Analysis`
 3. 点 `Run workflow`
-4. `mode` 建议第一次选 `stocks-only`
+4. `mode` 建议选 `full`，会同时生成大盘复盘并把大盘环境注入个股推荐
 5. `force_run` 保持勾选，周末/休市也能测试流程
-6. 跑完后，在 workflow run 页面下载 `free-analysis-reports-*` artifact
+6. 跑完后会推送到飞书；同时也可以在 workflow run 页面下载 `free-analysis-reports-*` artifact
 
 ## 默认定时
 
@@ -64,4 +86,12 @@ ALPHASIFT_ENABLED=false
 ENABLE_CHIP_DISTRIBUTION=false
 ```
 
-通知机器人不是必填。未配置企业微信、飞书、Telegram 等通知渠道时，报告仍会上传到 GitHub Actions artifact。
+推荐质量默认开启：
+
+```text
+REPORT_TYPE=full
+DAILY_MARKET_CONTEXT_ENABLED=true
+MARKET_REVIEW_ENABLED=true
+```
+
+未配置飞书时，报告仍会上传到 GitHub Actions artifact。
